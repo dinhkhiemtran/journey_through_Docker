@@ -1,2 +1,83 @@
+#General commands
+docker ps 	//List running containers
+docker ps -a 	//List all containers
+docker ps -s 	//List running containers
+
+
+(with CPU / memory)
+docker images 	//List all images
+docker exec -it <container> bash 	//Connecting to container
+docker logs <container> 	//Shows container's console log
+docker stop <container> 	//Stop a container
+docker restart <container> 	//Restart a container
+docker rm <container> 	//Remove a container
+docker port <container> 	//Shows container's port mapping
+docker top <container> 	//List processes
+docker kill <container> 	//Kill a container
+
 #Build the container image.
-docker build -t [name_docker] .
+docker build -t [getting-started] .
+
+#Start your container using the docker run command and specify the name of the image you just created
+docker run -dp 3000:3000 [getting-started]
+
+#Stop and Delete
+docker stop <the-container-id>
+docker rm <the-container-id>
+
+
+-----Share the application------
+#Use the docker tag command to give the getting-started image a new name. Be sure to swap out YOUR-USER-NAME with your Docker ID.
+docker tag getting-started [YOUR-USER-NAME]/[getting-started]
+
+#Now try your push command again. If you’re copying the value from Docker Hub, you can drop the tagname portion, as you didn’t add a tag to the image name. If you don’t specify a tag, Docker will use a tag called latest.
+docker push [YOUR-USER-NAME]/[getting-started]
+
+-----------Run the image on a new instance---------------------
+#To build an image for the amd64 platform, use the --platform flag.
+docker build --platform linux/amd64 -t YOUR-USER-NAME/getting-started .
+
+
+-----------Persist the DB-----------
+#Create a volume by using the docker volume create command.
+docker volume create todo-db
+
+#Start the todo app container, but add the --mount option to specify a volume mount. Give the volume a name, and mount it to /etc/todos in the container, which captures all files created at the path.
+docker run -dp 3000:3000 --mount type=volume,src=[todo-db],target=/etc/[todos] [getting-started]
+
+#view volume
+docker volume inspect todo-db
+
+#bind mounts
+docker run -it --mount type=bind,src="$(pwd)",target=/src ubuntu bash
+
+#check logs
+docker logs -f <container-id>
+
+
+---------Creating---------
+docker create [options] IMAGE
+  -a, --attach               # attach stdout/err
+  -i, --interactive          # attach stdin (interactive)
+  -t, --tty                  # pseudo-tty
+      --name NAME            # name your image
+  -p, --publish 5000:5000    # port map (host:container)
+      --expose 5432          # expose a port to containers
+  -P, --publish-all          # publish all ports
+      --link container:alias # linking
+  -v, --volume `pwd`:/app    # mount (absolute paths needed)
+  -e, --env NAME=hello       # env vars
+
+
+#Docker Networking
+docker network rm MyOverlayNetwork    //Removing a network
+
+docker network ls                      //Listing networks
+
+docker network inspect [MyOverlayNetwork]  //Getting information about a network 
+
+docker network connect [MyOverlayNetwork] nginx  //Connecting a running container to a network
+
+docker run -it -d --network=[MyOverlayNetwork] nginx    //Connecting a container to a network when it starts
+
+docker network disconnect [MyOverlayNetwork] nginx   //Disconnecting a container from a network
